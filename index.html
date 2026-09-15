@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>アカウント・ポータル — M-T644-V3 (v1.0.1)</title>
+<style>
+  body{font-family:-apple-system,"Hiragino Sans",sans-serif;margin:0;color:#1a1a2e;background:#f6f7fb}
+  main{max-width:1080px;margin:0 auto;padding:24px}
+  h1{font-size:1.5rem} h2{font-size:1.15rem;margin-top:32px;border-left:4px solid #3656c5;padding-left:8px}
+  .summary{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+  .card{background:#fff;border:1px solid #dfe3ee;border-radius:8px;padding:16px 24px;min-width:160px}
+  .card b{font-size:1.6rem;display:block;color:#3656c5}
+  .note{background:#fff8e6;border:1px solid #ead27a;border-radius:8px;padding:12px 16px;font-size:.9rem}
+  table{width:100%;border-collapse:collapse;background:#fff;font-size:.88rem}
+  th,td{border:1px solid #dfe3ee;padding:6px 10px;text-align:left}
+  th{background:#eef1f9}
+  details{background:#fff;border:1px solid #dfe3ee;border-radius:6px;margin:6px 0;padding:8px 12px}
+  summary{cursor:pointer;font-weight:600}
+  .tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.75rem;margin-left:8px}
+  .t-confirmed{background:#e2f5e9;color:#176b38}.t-ambiguous{background:#fdeaea;color:#a12222}.t-unregistered{background:#eee;color:#555}
+  dl{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;font-size:.88rem} dt{color:#666} dd{margin:0}
+  footer{margin-top:40px;font-size:.8rem;color:#777}
+</style>
+</head>
+<body>
+<main>
+<h1>アカウント・ポータル — 経営レビュー / 担当者確認</h1>
+<p>基準日: 2026-09-15 ／ 対象スコープ: 24社 ／ 出典: Salesforce (2026-09-15 照会) + Source Register / Strategy Brief rev 2026-09-10 / 承認カレンダー CAL-2026-09-11-r3</p>
+
+<section class="summary" aria-label="executive-summary">
+  <div class="card"><b>19</b>確定アカウント</div>
+  <div class="card"><b>12</b>オープン商談</div>
+  <div class="card"><b>$2,037,000</b>オープン・パイプライン</div>
+</section>
+<p class="note">集計は確定照合のみ。商談なし5社(金額0)・曖昧照合1社(T19 Northstar)・CRM未登録4社(T21–T24)は件数・金額に含みません。<br>参考(別枠): Closed Won $154,000 / Closed Lost $88,000 はオープン pipeline から除外。</p>
+
+<div id="app"></div>
+
+<footer>
+データ出典: <a href="https://github.com/qa921/m-t644-v3-account-portfolio">qa921/m-t644-v3-account-portfolio</a> (release v1.0.1) ／ 照合記録: docs/reconciliation-2026-09-15.md ／ 運用手順: docs/operations.md
+</footer>
+</main>
+
+<script>
+const SUMMARY={asOf:'2026-09-15',scope:24,confirmed:19,openOpps:12,openPipeline:2037000,closedWon:154000,closedLost:88000,noOpp:5,ambiguous:1,unregistered:4};
+const SF='https://orgfarm-af8e6fe1d6-dev-ed.develop.my.salesforce.com/';
+const TS='2026-09-15T09:44:48Z';
+const REV='CAL-2026-09-11-r3';
+const A=[
+{id:'T01',n:'Asteron Cloud',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PZQAZ',ind:'Technology',opp:{id:'006gK00000OG4bJQAT',name:'Asteron Cloud — Platform Expansion',stage:'Proposal/Price Quote',amt:185000,close:'2026-10-30'},onb:[['Security handoff','2026-11-12','Morgan Lee']],sig:'Expansion sponsor engaged',upd:'2026-09-10'},
+{id:'T02',n:'Beacon Retail Group',seg:'Mid-market',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PaQAJ',ind:'Retail',opp:{id:'006gK00000OG4bKQAT',name:'Beacon Retail Group — Store Analytics',stage:'Qualification',amt:92000,close:'2026-11-15'},onb:[],sig:'Multi-site rollout candidate',upd:'2026-09-08'},
+{id:'T03',n:'Cedar & Finch',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PbQAJ',ind:'Financial Services',opp:{id:'006gK00000OG4bLQAT',name:'Cedar & Finch — Renewal',stage:'Negotiation/Review',amt:240000,close:'2026-10-12'},onb:[['Renewal transition','2026-10-20','Morgan Lee']],sig:'Renewal at executive attention',upd:'2026-09-09'},
+{id:'T04',n:'Delta Forge Manufacturing',seg:'Commercial',pri:'P2',sp:'Priya Nair',st:'confirmed',acc:'001gK00001Tc4PcQAJ',ind:'Manufacturing',opp:{id:'006gK00000OG4bMQAT',name:'Delta Forge Manufacturing — Plant Rollout',stage:'Needs Analysis',amt:128000,close:'2026-12-20'},onb:[],sig:'Implementation complexity high',upd:'2026-09-06'},
+{id:'T05',n:'Ember Health Systems',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PdQAJ',ind:'Healthcare',opp:{id:'006gK00000OG4bNQAT',name:'Ember Health Systems — Care Operations',stage:'Value Proposition',amt:310000,close:'2027-01-18'},onb:[['Technical discovery','2027-01-27','Ravi Shah']],sig:'Strategic health-system logo',upd:'2026-09-10'},
+{id:'T06',n:'Fjord Logistics',seg:'Commercial',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PeQAJ',ind:'Transportation',opp:{id:'006gK00000OG4bOQAT',name:'Fjord Logistics — Fleet Visibility',stage:'Prospecting',amt:76000,close:'2026-12-05'},onb:[],sig:'Early fleet transformation',upd:'2026-09-05'},
+{id:'T07',n:'Granite Civic Labs',seg:'Public sector',pri:'P1',sp:'Priya Nair',st:'confirmed',acc:'001gK00001Tc4PfQAJ',ind:'Government',opp:{id:'006gK00000OG4bPQAT',name:'Granite Civic Labs — Service Portal',stage:'Closed Won',amt:154000,close:'2026-09-01'},onb:[['Discovery kickoff','2026-09-22','Avery Chen'],['Data access complete','2026-10-06','Avery Chen']],sig:'Won; onboarding risk',upd:'2026-09-11'},
+{id:'T08',n:'Helio Energy Partners',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PgQAJ',ind:'Energy',opp:{id:'006gK00000OG4bQQAT',name:'Helio Energy Partners — Grid Data',stage:'Proposal/Price Quote',amt:205000,close:'2026-11-28'},onb:[['Implementation planning','2026-12-04','Avery Chen']],sig:'Pricing decision approaching',upd:'2026-09-10'},
+{id:'T09',n:'Ivybridge Education',seg:'Commercial',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PhQAJ',ind:'Education',opp:{id:'006gK00000OG4bRQAT',name:'Ivybridge Education — Campus Rollout',stage:'Id. Decision Makers',amt:118000,close:'2027-02-10'},onb:[['Campus readiness','2027-02-18','Ravi Shah']],sig:'Committee map incomplete',upd:'2026-09-07'},
+{id:'T10',n:'Juniper Foods',seg:'Commercial',pri:'P3',sp:'Priya Nair',st:'confirmed',acc:'001gK00001Tc4PiQAJ',ind:'Consumer Goods',opp:{id:'006gK00000OG4bSQAT',name:'Juniper Foods — Demand Planning',stage:'Closed Lost',amt:88000,close:'2026-08-28'},onb:[],sig:'Loss lessons for re-entry (open pipeline から除外)',upd:'2026-08-29'},
+{id:'T11',n:'Keystone Insurance',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PjQAJ',ind:'Financial Services',opp:{id:'006gK00000OG4bTQAT',name:'Keystone Insurance — Claims Automation',stage:'Negotiation/Review',amt:275000,close:'2026-10-25'},onb:[],sig:'Procurement risk',upd:'2026-09-10'},
+{id:'T12',n:'Lumen Hospitality',seg:'Mid-market',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PkQAJ',ind:'Hospitality',opp:{id:'006gK00000OG4bUQAT',name:'Lumen Hospitality — Guest Insights',stage:'Qualification',amt:64000,close:'2026-11-08'},onb:[['Discovery readiness','2026-11-19','Morgan Lee']],sig:'Use case discovery',upd:'2026-09-09'},
+{id:'T13',n:'Mosaic Media Network',seg:'Commercial',pri:'P2',sp:'Priya Nair',st:'confirmed',acc:'001gK00001Tc4PlQAJ',ind:'Media',opp:{id:'006gK00000OG4bVQAT',name:'Mosaic Media Network — Audience Platform',stage:'Perception Analysis',amt:146000,close:'2026-12-16'},onb:[],sig:'Champion enablement needed',upd:'2026-09-04'},
+{id:'T14',n:'Nimbus Bioanalytics',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PmQAJ',ind:'Healthcare',opp:{id:'006gK00000OG4bWQAT',name:'Nimbus Bioanalytics — Research Workspace',stage:'Needs Analysis',amt:198000,close:'2027-01-08'},onb:[],sig:'Data architecture dependency',upd:'2026-09-11'},
+{id:'T15',n:'Orchard Mobility',seg:'Commercial',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PnQAJ',ind:'Transportation',opp:null,onb:[],sig:'Confirmed account; no opportunity',upd:'2026-09-03'},
+{id:'T16',n:'Pillar Financial',seg:'Enterprise',pri:'P2',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PoQAJ',ind:'Financial Services',opp:null,onb:[['Executive alignment','2026-10-31','Ravi Shah']],sig:'Confirmed account; no opportunity',upd:'2026-09-02'},
+{id:'T17',n:'QuarryWorks',seg:'Commercial',pri:'P3',sp:'Priya Nair',st:'confirmed',acc:'001gK00001Tc4PpQAJ',ind:'Manufacturing',opp:null,onb:[],sig:'Confirmed account; no opportunity',upd:'2026-09-01'},
+{id:'T18',n:'Riverbend Telecom',seg:'Enterprise',pri:'P2',sp:'Daniel Reed',st:'confirmed',acc:'001gK00001Tc4PqQAJ',ind:'Telecommunications',opp:null,onb:[],sig:'Confirmed account; no opportunity',upd:'2026-09-08'},
+{id:'T19',n:'Northstar',seg:'Enterprise',pri:'P1',sp:'Mika Sato',st:'ambiguous',acc:null,cands:[['Northstar Health Group','001gK00001Tc4PrQAJ','Healthcare'],['Northstar Health Partners','001gK00001Tc4PsQAJ','Healthcare']],opp:null,onb:[['Onboarding placeholder','2026-11-19','Morgan Lee','CRM選定まで配布不可']],sig:'Needs manual CRM selection — 候補統合せず全集計から除外',upd:'2026-09-10'},
+{id:'T20',n:'Northstar Health Partners',seg:'Enterprise',pri:'P2',sp:'Mika Sato',st:'confirmed',acc:'001gK00001Tc4PsQAJ',ind:'Healthcare',opp:null,onb:[],sig:'Confirmed account; no opportunity (T19とは別管理)',upd:'2026-09-09'},
+{id:'T21',n:'HarborWorks',seg:'Commercial',pri:'P2',sp:'Priya Nair',st:'crm-unregistered',acc:null,opp:null,onb:[['Pilot readiness','2026-10-14','Avery Chen']],sig:'High strategic fit claimed — CRM未登録、集計外',upd:'2026-09-07'},
+{id:'T22',n:'Meridian Learning Collective',seg:'Education',pri:'P2',sp:'Daniel Reed',st:'crm-unregistered',acc:null,opp:null,onb:[['Implementation briefing','2026-10-29','Ravi Shah']],sig:'Implementation candidate — CRM未登録、集計外',upd:'2026-09-06'},
+{id:'T23',n:'Solace Housing Alliance',seg:'Public sector',pri:'P3',sp:'Priya Nair',st:'crm-unregistered',acc:null,opp:null,onb:[],sig:'Research only — CRM未登録、集計外',upd:'2026-09-05'},
+{id:'T24',n:'Tidemark Public Media',seg:'Commercial',pri:'P3',sp:'Daniel Reed',st:'crm-unregistered',acc:null,opp:null,onb:[],sig:'Monitor; no verified pipeline — CRM未登録、集計外',upd:'2026-09-04'}
+];
+const LBL={confirmed:'確定 (CRM照合済み)',ambiguous:'曖昧照合 (要手動解決)','crm-unregistered':'CRM未登録'};
+const CLS={confirmed:'t-confirmed',ambiguous:'t-ambiguous','crm-unregistered':'t-unregistered'};
+const fmt=n=>'$'+n.toLocaleString('en-US');
+function row(a){return `<details><summary>${a.id} — ${a.n} <span class="tag ${CLS[a.st]}">${LBL[a.st]}</span> <small>${a.seg} / ${a.pri} / ${a.sp}</small></summary>
+${a.st==='confirmed'?`<h4>CRM記録</h4><dl><dt>Account ID</dt><dd><a href="${SF}${a.acc}">${a.acc}</a></dd><dt>業種</dt><dd>${a.ind}</dd><dt>最終更新</dt><dd>${TS}</dd></dl>`:''}
+${a.st==='ambiguous'?`<h4>CRM記録</h4><p>手動解決まで候補を統合しません:</p><ul>${a.cands.map(c=>`<li>${c[0]} (${c[1]}, ${c[2]})</li>`).join('')}</ul>`:''}
+${a.st==='crm-unregistered'?`<h4>CRM記録</h4><p>未登録 — 集計外。作成・解決は集計の外で実施。</p>`:''}
+<h4>商談</h4>${a.opp?`<dl><dt>Opportunity ID</dt><dd>${a.opp.id}</dd><dt>商談名</dt><dd>${a.opp.name}</dd><dt>ステージ</dt><dd>${a.opp.stage}</dd><dt>金額</dt><dd>${fmt(a.opp.amt)}</dd><dt>クローズ予定日</dt><dd>${a.opp.close}</dd></dl>`:(a.st==='confirmed'?'<p>確定アカウント・商談なし (金額0、pipeline 除外)</p>':'<p>—</p>')}
+<h4>導入予定 (承認カレンダー ${REV})</h4>${a.onb.length?`<ul>${a.onb.map(m=>`<li>${m[1]} — ${m[0]} (担当: ${m[2]})${m[3]?' <strong>⚠ '+m[3]+'</strong>':''}</li>`).join('')}</ul>`:'<p>承認済みマイルストーンなし</p>'}
+<h4>出典・戦略的評価</h4><p>Source Register 更新 ${a.upd} / Strategy Brief rev 2026-09-10 / Salesforce ${SUMMARY.asOf}</p><p><em>戦略的評価 (アナリスト解釈、CRMファクトではない):</em> ${a.sig}</p>
+</details>`}
+const app=document.getElementById('app');
+for(const st of ['confirmed','ambiguous','crm-unregistered']){
+  const rows=A.filter(a=>a.st===st);
+  app.innerHTML+=`<h2>${LBL[st]} (${rows.length}社)</h2>`+rows.map(row).join('');
+}
+</script>
+</body>
+</html>
